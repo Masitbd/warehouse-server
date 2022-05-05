@@ -22,7 +22,8 @@ async function run(){
 try {
    client.connect() 
    const itemCollection = client.db('warehouseManagement').collection('item')
-
+ 
+   // get data
 
    app.get('/item', async(req,res)=>{
        const query = {}
@@ -38,6 +39,38 @@ try {
     const item = await itemCollection.findOne(query);
     res.send(item);
 });
+
+
+// post data
+
+app.post('/item',async(req,res) =>{
+    const newItem = req.body
+    const result = await itemCollection.insertOne(newItem)
+    res.send(result)
+})
+
+// update
+app.put('/item/:id', async(req,res)=>{
+    const id = req.params.id 
+    const data = req.body
+    //console.log('from put method',id)
+    const filter = {_id: ObjectId(id)}
+    const options = {upsert: true}
+    const updateDoc = { $set: { 
+     ...data
+     }};
+     const result = await itemCollection.updateOne(filter, updateDoc, options )
+     res.send(result)
+
+})
+
+// delete
+app.delete('/item/:id', async(req,res)=>{
+const id = req.params.id
+const query = {_id: ObjectId(id)}
+const result = await itemCollection.deleteOne(query)
+res.send(result)
+})
 } finally {
     
 }
